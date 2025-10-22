@@ -1,5 +1,12 @@
+.serverless/
+
 .idea
 
 .ipynb_checkpoints/
 
 bp-*/
+
+.DS_Store
+.python-version
+
+node_modules/
