@@ -52,3 +52,10 @@ repos:
       # Fixing automatically things like autoflake, but does something more too
       - id: ruff
         args: [ --fix ]
+  - repo: https://github.com/facebook/pyrefly-pre-commit
+    rev: 0.0.1
+    hooks:
+      - id: pyrefly-typecheck-specific-version
+        name: Pyrefly (type checking)
+        pass_filenames: false
+        additional_dependencies: ["pyrefly==0.38.2"]
