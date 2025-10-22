@@ -14,12 +14,14 @@ def process_data(data):
 def process():
     data = request.json.get("data", [])
 
-    # Breakpoint using fifo streams
-    import pdb; pdb.Pdb(stdin=open("fifo_stdin"), stdout=open("fifo_stdout", "w"))
+    # Breakpoint with open web server for debugging
+    import web_pdb
+
+    web_pdb.set_trace()
 
     result = process_data(data)
     return {"average": result}
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5555)
+    app.run(host="0.0.0.0", port=4444)

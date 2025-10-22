@@ -1,0 +1,25 @@
+service: simple-pg-lambda
+
+provider:
+  name: aws
+  runtime: python3.12
+  region: eu-north-1
+  architecture: arm64
+  timeout: 300
+  environment:
+    PG_HOST: 4.tcp.eu.ngrok.io
+    PG_DB: postgres
+    PG_USER: postgres
+    PG_PASSWORD: mysecretpassword123
+    PG_PORT: 13216
+
+functions:
+  hello:
+    handler: lambda_handler.main
+    events:
+      - httpApi:
+          path: /
+          method: get
+
+plugins:
+  - serverless-python-requirements
