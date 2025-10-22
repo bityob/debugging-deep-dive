@@ -13,10 +13,10 @@ def process_data(data):
 @app.route("/process", methods=["POST"])
 def process():
     data = request.json.get("data", [])
-    # Set a remote-pdb breakpoint
-    from remote_pdb import RemotePdb
 
-    RemotePdb("0.0.0.0", 4444).set_trace()  # Opens socket for debugging
+    # Breakpoint using fifo streams
+    breakpoint(stdin=open("/tmp/fifo_stdin"), stdout=open("/tmp/fifo_stdout", "w"))
+
     result = process_data(data)
     return {"average": result}
 
