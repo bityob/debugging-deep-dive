@@ -15,9 +15,7 @@ def process():
     data = request.json.get("data", [])
 
     # Breakpoint using fifo streams
-    import pdb
-
-    pdb.Pdb(stdin=open("fifo_stdin"), stdout=open("fifo_stdout", "w"))
+    import pdb; pdb.Pdb(stdin=open("fifo_stdin"), stdout=open("fifo_stdout", "w"))
 
     result = process_data(data)
     return {"average": result}
