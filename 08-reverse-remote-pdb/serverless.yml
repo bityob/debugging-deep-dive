@@ -4,6 +4,8 @@ provider:
   name: aws
   runtime: python3.12
   region: eu-north-1
+  # Wrong architecture caused that we built that package with other architecture which caused
+  # the lambda to fail with error the module is not found... "No module named psycopg2"
   architecture: arm64
   timeout: 300
   environment:
