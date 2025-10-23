@@ -3,7 +3,6 @@ import os
 
 def main(event, context):
     from remote_pdb import RemotePdb
-
     RemotePdb("2.tcp.eu.ngrok.io", 18909, reverse=True).set_trace()
 
     import psycopg
