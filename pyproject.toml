@@ -13,4 +13,5 @@ dependencies = [
 [tool.uv.workspace]
 members = [
     "03-pdbpp",
+    "11-gdb",
 ]
