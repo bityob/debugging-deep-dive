@@ -10,3 +10,5 @@ bp-*/
 .python-version
 
 node_modules/
+
+dist
