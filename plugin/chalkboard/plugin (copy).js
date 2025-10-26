@@ -87,7 +87,7 @@ const initChalkboard = function(Reveal){
 		{ color: 'rgba(220,0,220,0.5)', cursor: 'url(' + path + 'img/chalk-purple.png), auto'},
 		{ color: 'rgba(255,220,0,0.5)', cursor: 'url(' + path + 'img/chalk-yellow.png), auto'}
 	];
-	var keyBindings = {
+	var keyBindings = { 
 		toggleNotesCanvas: { keyCode: 67, key: 'C', description: 'Toggle notes canvas' },
 		toggleChalkboard: { keyCode: 66, key: 'B', description: 'Toggle chalkboard' },
 		clear: { keyCode: 171, key: '+', description: 'Clear drawings on slide' },
@@ -174,7 +174,7 @@ const initChalkboard = function(Reveal){
 			callback();
 		}
 		else {
-console.log("Wait for pdf pages to be created and drawings to be loaded");
+console.log("Wait for pdf pages to be created and drawings to be loaded"); 
 			setTimeout( whenReady, 500, callback )
 		}
 	}
@@ -359,10 +359,10 @@ console.log("Wait for pdf pages to be created and drawings to be loaded");
 	var loaded = null;
 
         if ( config.storage ) {
-		// Get chalkboard drawings from session storage
+		// Get chalkboard drawings from session storage 
 		loaded = initStorage( sessionStorage.getItem( config.storage ) );
 	}
-
+	
 	if ( !loaded && config.src != null ) {
 		// Get chalkboard drawings from the given file
 		loadData( config.src );
@@ -512,7 +512,7 @@ console.log("Drawings loaded from file");
 
 	function createPrintout( ) {
 console.warn(Reveal.getTotalSlides(),Reveal.getSlidesElement());
-		if ( storage[1].data.length == 0 ) return;
+		if ( storage[1].data.length == 0 ) return; 
 console.log( 'Create printout(s) for ' + storage[1].data.length + " slides");
 		drawingCanvas[0].container.style.opacity = 0; // do not print notes canvas
 		drawingCanvas[0].container.style.visibility = 'hidden';
@@ -528,7 +528,7 @@ console.log( 'Create printout for slide ' + storage[1].data[i].slide.h + "." + s
 				var slide = slides[ storage[1].data[i].slide.h][ storage[1].data[i].slide.v ];
 //console.log("Slide:", slide);
 				addDrawings( slide, drawings );
-
+				
 			}
 //			Reveal.sync();
 		};
@@ -553,9 +553,9 @@ console.log( 'Create printout for slide ' + storage[1].data[i].slide.h + "." + s
 					slides[slides.length-1][slides[slides.length-1].length-1] = horizontal[i];
 				}
 			}
-			else {
+			else {		
 				// Vertical slides
-				var vertical = horizontal[i].querySelectorAll('section');
+				var vertical = horizontal[i].querySelectorAll('section'); 
 				slides.push([]);
 				var slidenumber = undefined;
 				for ( var j=0; j < vertical.length; j++) {
@@ -1015,7 +1015,7 @@ console.log( 'Create printout(s) for slide ', slideData);
 		}
 
 		// continue with next message if queued
-		if ( eventQueue.length > 0 ) {
+		if ( eventQueue.length > 0 ) { 
 			processQueue();
 		}
 		else {
@@ -1621,7 +1621,7 @@ console.log("Create printouts when ready");
 					var idx = 0;
 					if (color[mode]) {
 						idx = color[mode];
-					}
+					} 
 
 					setColor(idx, true);
 
@@ -1662,7 +1662,7 @@ console.log("Create printouts when ready");
 
 				if (rememberColor[mode]) {
 					idx = color[mode];
-				}
+				} 
 
 				setColor(idx, true);
 

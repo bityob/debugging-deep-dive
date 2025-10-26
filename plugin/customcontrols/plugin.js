@@ -4,7 +4,7 @@
 ** A plugin replacing the default controls by custom controls.
 **
 ** Version: 2.0.0
-**
+** 
 ** License: MIT license (see LICENSE.md)
 **
 ******************************************************************/
@@ -66,3 +66,4 @@ const initCustomControls = function(Reveal){
 	return this;
 
 };
+

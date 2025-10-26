@@ -1,7 +1,7 @@
 #customcontrols {
 	z-index: 40;
-	position: fixed;
-	left: 70px;
+	position: fixed; 
+	left: 70px; 
 	bottom: 30px;
 	text-align: center;
 	font-size: 24px;
@@ -23,8 +23,8 @@
 }
 
 #customcontrols > ul {
-	position: fixed;
-	left: 54px;
+	position: fixed; 
+	left: 54px; 
 	bottom: 64px;
 	list-style-type: none;
 	overflow: hidden;
@@ -44,11 +44,11 @@
 
 #customcontrols.collapsed  #collapse-customcontrols, #customcontrols.collapsed > ul  {
 	display: none;
-}
+} 
 
 #customcontrols:not(.collapsed) #expand-customcontrols {
 	display: none;
-}
+} 
 
 @media only screen and (min-width: 500px) {
 	#customcontrols > button {
