@@ -60,7 +60,7 @@
 				fitElement(element, start, size);
 			} else {
 				fitElement(element, size, end);
-			}		
+			}
 		}
 
 
@@ -89,7 +89,7 @@
 
 ##  Breakpoints in the Cloud: Debugging Python Beyond Your IDE
 
-**RND Light Talk**, October 2025
+**PyWeb**, October 2025
 
 [bit.ly/debug-slides](https://bit.ly/debug-slides)
 </br>
@@ -115,12 +115,11 @@ Yonatan Bitton
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
-### Introduction 
+### Introduction
 
-**Debugging** - one of the hardest, yet most powerful skills in a developer’s toolbox
+**Debugging** — one of the hardest, yet most powerful skills in a developer’s toolbox
 - Essential for developers and researchers
-- Comes **after** tests, metrics, and logging
-- Used when all other signals fail
+- Helps us understand *why* code fails when everything else looks fine
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
@@ -130,7 +129,7 @@ Yonatan Bitton
 - Tools like Sentry help us understand exceptions
 - Ideally, we fix the bug directly from data - no need to “step in”
 
-**But sometimes... logs aren’t enough.**  
+**But sometimes... logs aren’t enough.**
 The stack trace is unclear. Something’s _weird_
 <!-- .element: class="fragment" -->
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
@@ -144,14 +143,14 @@ The stack trace is unclear. Something’s _weird_
 - See what variables do, line by line
 - Understand _why_ the logic fails
 
-Keep this mindset: **curious, hands-on, inside the code**
+Keep this mindset: **curious, methodical, and never afraid to dive deeper**
 <!-- .element: class="fragment" -->
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
 ### Three Debugging Zones
 
-- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->**No Debugging Needed** - enough info from metrics, logs, and exception collectors (e.g., Sentry)
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->**No Debugging Needed** - enough info from metrics, logs, or monitoring tools
 - &shy;<!-- .element: class="fragment" data-fragment-index="2" -->**Interactive Debugging** - reproduce and debug in production/testing where the issue occurs, or preferably in a local controlled environment
 - &shy;<!-- .element: class="fragment" data-fragment-index="3" -->**Non-interactive Debugging** — debug without attaching; use tracing, spying, or dump analysis
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
@@ -159,7 +158,7 @@ Keep this mindset: **curious, hands-on, inside the code**
 
 ### Let’s begin!
 
-From **local and simple**  
+From **local and simple**
 → to **remote, restricted, and deep**
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
@@ -228,14 +227,14 @@ Notes:
 ### Same power, better experience
 
 - `pdb` is functional but plain
-- `pdb++` builds on it with quality-of-life improvements:    
+- `pdb++` builds on it with quality-of-life improvements:
     - Sticky mode (keeps code visible)
     - Syntax highlighting
-- From now on, assume we’re using `pdb++` under the hood.
+- From now on, assume we’re using `pdb++` under the hood
 - Run `python -m pdb debug_with_pdbpp.py` just like normal pdb
 
 
-Notes:  
+Notes:
 
 “`pdb` does the job, but it’s ugly. Let’s see how `pdb++` gives us the same power with a cleaner interface.”
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
@@ -317,8 +316,8 @@ Notes:
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
 ```python
-# Set a remote-pdb breakpoint  
-from remote_pdb import RemotePdb  
+# Set a remote-pdb breakpoint
+from remote_pdb import RemotePdb
 # Opens socket for debugging
 RemotePdb('0.0.0.0', 4444).set_trace()
 ```
@@ -338,7 +337,7 @@ docker run --name flask-debug flask-debug
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
-Second shell - Wait for breakpoint on server 
+Second shell - Wait for breakpoint on server
 
 ```python
 docker exec -it flask-debug bash
@@ -439,7 +438,7 @@ cat fifo_stdout & cat > fifo_stdin
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
-Second shell - Run the web server 
+Second shell - Run the web server
 
 ```python
 uv run fifo_app.py
@@ -465,9 +464,9 @@ uvx --from httpie http POST :5555/process data:='["1", "two"]'
 
 ### When you have no access at all...
 
-- In **serverless** environments (e.g., AWS Lambda), we can’t open sockets or SSH in  
-- Solution: reverse the connection  
-- The Lambda connects _to us_ through a public tunnel (e.g., `ngrok`)  
+- In **serverless** environments (e.g., AWS Lambda), we can’t open sockets or SSH in
+- Solution: reverse the connection
+- The Lambda connects _to us_ through a public tunnel (e.g., `ngrok`)
 - Same debugging flow — just inverted
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
@@ -475,18 +474,18 @@ uvx --from httpie http POST :5555/process data:='["1", "two"]'
 ### Real Case
 
 
-- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->Lambda failed to connect to Postgres → “No module named psycopg2”  
-- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->Worked perfectly in local Docker runtime  
-- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->No SSH, no open sockets — true serverless environment  
-- &shy;<!-- .element: class="fragment" data-fragment-index="4" -->Solution: reverse the connection  
-	- &shy;<!-- .element: class="fragment" data-fragment-index="5" -->Lambda connects **out** to our `ngrok` tunnel  
-	- &shy;<!-- .element: class="fragment" data-fragment-index="6" -->We debug locally through that socket  
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->Lambda failed to connect to Postgres → “No module named psycopg2”
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->Worked perfectly in local Docker runtime
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->No SSH, no open sockets — true serverless environment
+- &shy;<!-- .element: class="fragment" data-fragment-index="4" -->Solution: reverse the connection
+	- &shy;<!-- .element: class="fragment" data-fragment-index="5" -->Lambda connects **out** to our `ngrok` tunnel
+	- &shy;<!-- .element: class="fragment" data-fragment-index="6" -->We debug locally through that socket
 - &shy;<!-- .element: class="fragment" data-fragment-index="7" -->Root cause was visible only **inside** the Lambda runtime
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
 ```python
-from remote_pdb import RemotePdb  
+from remote_pdb import RemotePdb
 RemotePdb("2.tcp.eu.ngrok.io", 18909, reverse=True).set_trace()
 ...
 import psycopg
@@ -494,7 +493,11 @@ import psycopg
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
-First shell - Listen to incoming connections 
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251023105829.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+First shell - Listen to incoming connections
 
 ```python
 nc -l 4444
@@ -512,15 +515,11 @@ ngrok tcp 4444
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
-Third shell - Trigger the lambda manually 
+Third shell - Trigger the lambda manually
 
 ```python
 sls invoke -f hello
 ```
-</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
-<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
-
-<img src="attachments/talks/slides/debugging_slides/Pasted image 20251023105829.png" alt="" style="object-fit: scale-down">
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
@@ -555,20 +554,20 @@ sls invoke -f hello
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
-```python[1|3-14|16]
+```python[1|3-14|8-12|16]
 import sys
 
 def trace_exceptions(frame, event, arg):
     if event == "exception":
         exc_type, exc_value, exc_traceback = arg
         file_path = frame.f_code.co_filename
-        
+
         if "debugging_with_sys_settrace" in file_path:
             print(f"Exception caught: {exc_type.__name__}: {exc_value}")
             print(f"  File: {frame.f_code.co_filename}")
             print(f"  Function: {frame.f_code.co_name}")
             print(f"  Line: {frame.f_lineno}")
-    
+
     return trace_exceptions
 
 sys.settrace(trace_exceptions)
@@ -613,7 +612,7 @@ sudo uv run py-spy dump --pid 10758
 
 ### When even Python crashes
 
-- Sometimes the crash happens **below** Python - in C extensions or the interpreter itself 
+- Sometimes the crash happens **below** Python - in C extensions or the interpreter itself
 - No traceback, no exception, just a _core dump_
 - `gdb` lets us inspect that dump and see the native stack trace
 - Essential for debugging native crashes (e.g., `libxml2`, `numpy`, `cython`, etc.)
@@ -622,10 +621,10 @@ sudo uv run py-spy dump --pid 10758
 
 ### Real Case
 
-- Crash happened during XML processing — no traceback, no logs  
-- Using `gdb` on the core dump revealed a native library issue  
-- Turns out, two dependencies linked against **different `libxml2` versions**  
-- The mismatch caused a memory access crash inside C code  
+- Crash happened during XML processing — no traceback, no logs
+- Using `gdb` on the core dump revealed a native library issue
+- Turns out, two dependencies linked against **different `libxml2` versions**
+- The mismatch caused a memory access crash inside C code
 - `gdb` helped pinpoint the root cause quickly
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
@@ -650,11 +649,16 @@ gdb .venv/bin/python <core-dump-file>
 
 ### Summary: The Debugging Journey
 
-- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->We began with simple, local debugging  
-- &shy;<!-- .element: class="fragment" data-fragment-index="2" --> Moved through containers, remote servers, and serverless environments  
-- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->Ended with tracing, spying, and native crash analysis  
-- &shy;<!-- .element: class="fragment" data-fragment-index="4" -->The real skill isn’t just using tools — it’s knowing **which one fits each layer of control**  
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->We began with simple, local debugging
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" --> Moved through containers, remote servers, and serverless environments
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->Ended with tracing, spying, and native crash analysis
+- &shy;<!-- .element: class="fragment" data-fragment-index="4" -->The real skill isn’t just using tools — it’s knowing **which one fits each layer of control**
 - &shy;<!-- .element: class="fragment" data-fragment-index="5" -->And above all, keep the **debugger’s mindset**: curious, methodical, and never afraid to dive deeper
+
+
+Notes:
+
+We went from breakpoints to bytecode, but in the end, it’s not about the tools — it’s about how we think. Staying curious, systematic, and always ready to dig deeper.
 </div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
 <div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
 
