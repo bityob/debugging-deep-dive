@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title></title>
+    <link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="dist/theme/serif.css" id="theme" />
+    <link rel="stylesheet" href="plugin/highlight/monokai.css" />
+	<link rel="stylesheet" href="css/layout.css" />
+	<link rel="stylesheet" href="plugin/customcontrols/style.css">
+
+
+
+    <script defer src="dist/fontawesome/all.min.js"></script>
+
+	<script type="text/javascript">
+		var forgetPop = true;
+		function onPopState(event) {
+			if(forgetPop){
+				forgetPop = false;
+			} else {
+				parent.postMessage(event.target.location.href, "app://obsidian.md");
+			}
+        }
+		window.onpopstate = onPopState;
+		window.onmessage = event => {
+			if(event.data == "reload"){
+				window.document.location.reload();
+			}
+			forgetPop = true;
+		}
+
+		function fitElements(){
+			const itemsToFit = document.getElementsByClassName('fitText');
+			for (const item in itemsToFit) {
+				if (Object.hasOwnProperty.call(itemsToFit, item)) {
+					var element = itemsToFit[item];
+					fitElement(element,1, 1000);
+					element.classList.remove('fitText');
+				}
+			}
+		}
+
+		function fitElement(element, start, end){
+
+			let size = (end + start) / 2;
+			element.style.fontSize = `${size}px`;
+
+			if(Math.abs(start - end) < 1){
+				while(element.scrollHeight > element.offsetHeight){
+					size--;
+					element.style.fontSize = `${size}px`;
+				}
+				return;
+			}
+
+			if(element.scrollHeight > element.offsetHeight){
+				fitElement(element, start, size);
+			} else {
+				fitElement(element, size, end);
+			}
+		}
+
+
+		document.onreadystatechange = () => {
+			fitElements();
+			if (document.readyState === 'complete') {
+				if (window.location.href.indexOf("?export") != -1){
+					parent.postMessage(event.target.location.href, "app://obsidian.md");
+				}
+				if (window.location.href.indexOf("print-pdf") != -1){
+					let stateCheck = setInterval(() => {
+						clearInterval(stateCheck);
+						window.print();
+					}, 250);
+				}
+			}
+	};
+
+
+        </script>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+##  Breakpoints in the Cloud: Debugging Python Beyond Your IDE
+
+**RND Light Talk**, October 2025
+
+[bit.ly/nogil](https://bit.ly/nogil)
+
+<div class="" style="position: absolute; left: 0%; top: 70%; height: 30%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+Yonatan Bitton
+</br>[@bityob](https://linktr.ee/bityob)
+</br><a href="https://linktr.ee/bityob">linktr.ee/bityob</a>
+</div>
+
+<div class="" style="position: absolute; left: 60%; top: 70%; height: 30%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+
+</div>
+
+<div class="" style="position: absolute; left: 60%; top: 70%; height: 30%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<img src="attachments/talks/slides/debugging_slides/bityob.png" alt="" style="width: 150px; object-fit: fill">
+
+</div>
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Introduction
+
+**Debugging** - one of the hardest, yet most powerful skills in a developer’s toolbox
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->Essential for developers and researchers
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->Comes **after** tests, metrics, and logging
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->Used when all other signals fail
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Before Debugging
+
+- In production - we **prefer metrics, logs, and traces**
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->Tools like Sentry help us understand exceptions
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->Ideally, we fix the bug directly from data - no need to “step in”
+
+**But sometimes... logs aren’t enough.**
+The stack trace is unclear. Something’s _weird_
+<!-- .element: class="fragment" -->
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### The Debugging Mindset
+
+**“What on earth is going on in there?!”**
+
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->We want to **enter the code as it runs**
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->See what variables do, line by line
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->Understand _why_ the logic fails
+
+Keep this mindset: **curious, hands-on, inside the code**
+<!-- .element: class="fragment" -->
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Three Debugging Zones
+
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->**No Debugging Needed** - enough info from metrics, logs, and exception collectors (e.g., Sentry)
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->**Interactive Debugging** - reproduce and debug in production/testing where the issue occurs, or preferably in a local controlled environment
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->**Non-interactive Debugging** — debug without attaching; use tracing, spying, or dump analysis
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### IDE
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/Pasted image 20251020233608.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/Pasted image 20251020233817.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### pdb (The Python Debugger)
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### When the IDE isn’t enough...
+
+
+- Local debugging works great - until it doesn’t
+- What if the code runs in production or testing, not inside your IDE?
+- Time to drop into the terminal: `pdb`
+
+Moving from _visual_ debugging to _terminal_ debugging
+<!-- .element: class="fragment" -->
+
+Notes:
+
+“When the bug isn’t in my local dev environment anymore - I can’t just click play in the IDE. Let’s move to the command-line debugger.”
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+- Add `breakpoint()` to stop on this line
+- Run the script as usual - `python <script_file_name>.py`
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+- `n` (next) - continue to next line
+- `l` (list) - display source code around current line
+- `s` (step) - step into function
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+- Run script with `-m pdb` to start with pdb shell in the beginning
+- Add breakpoints manually using `b <file_path or current file>:<line_number>`
+- You can add a conditional breakpoint with adding `, <python logic condition>`
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/Pasted image 20251020235229.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021102217.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### pdb++
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Same power, better experience
+
+- `pdb` is functional but plain.
+- `pdb++` builds on it with quality-of-life improvements:
+    - Sticky mode (keeps code visible)
+    - Syntax highlighting
+- From now on, assume we’re using `pdb++` under the hood.
+- Run `python -m pdb debug_with_pdbpp.py` just like normal pdb
+
+
+Notes:
+
+“`pdb` does the job, but it’s ugly. Let’s see how `pdb++` gives us the same power with a cleaner interface.”
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021192309.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021192330.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021192413.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021192436.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+- Run with `-m pdb` to stop on **unhandled exceptions**
+- View the full stack trace using `w` (**where**)
+- Navigate up and down the stack with `u` (**up**) and `d` (**down**) commands
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021205832.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021210929.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### IPython
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Debugging small code blocks interactively
+
+- Sometimes we don’t need to run the full app
+- We just want to test a few lines, functions, or reproduce a bug inline
+- `IPython` gives a quick way to do that:
+    - `%pdb on` to auto-enter post-mortem on exceptions
+    - `%debug` to step through snippets
+- Great for Jupyter or ad-hoc shell debugging
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021221020.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021221220.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021221446.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021221513.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Remote PDB
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### When the bug only happens remotely...
+
+- Local debugging isn’t always possible
+- The code runs on a **server, container, or Kubernetes pod**
+- No standard input/output, no IDE
+- `remote-pdb` lets us open a socket and connect to it from outside
+- Trigger the bug (e.g., via HTTP request) → connect via telnet → debug
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```python
+# Set a remote-pdb breakpoint
+from remote_pdb import RemotePdb
+# Opens socket for debugging
+RemotePdb('0.0.0.0', 4444).set_trace()
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+First shell - Run the web server on docker container
+
+```python
+docker build -t flask-debug .
+docker run -p 5555:5555 -p 4444:4444 flask-debug
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021225014.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Second shell - Wait for breakpoint on server
+
+```python
+until telnet 127.0.0.1 4444; do sleep 2; done
+```
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021225156.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Third shell - Send web request for hitting the breakpoint
+
+```python
+uvx --from httpie http POST :5555/process data:='["1", "two"]'
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021225715.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251021225822.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Web PDB
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Making remote debugging visual
+
+- Same idea as `remote-pdb`, but easier to control
+- `web-pdb` opens a mini web UI you can control from your browser
+- Useful when you **do** have network access to the container or server
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```python
+import web_pdb
+web_pdb.set_trace()
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+First shell - Run the web server on a docker container with open ports for the application and the debugger both
+
+```python
+docker run -it -p 4444:4444 -p 5555:5555 webpdb
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Second shell - Send web request for hitting the breakpoint
+
+```python
+uvx --from httpie http POST :4444/process data:='["1", "two"]'
+```
+
+Now, go to http://localhost:5555/ in the browser...
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251022232014.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### FIFO Streams
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### No network? No problem
+
+- In restricted environments, we can’t open network ports
+- `FIFO` (named pipes) let us redirect stdin/stdout locally
+- Works when you have shell access but **no network** access
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```python
+import pdb
+pdb.Pdb(stdin=open("fifo_stdin"), stdout=open("fifo_stdout", "w")).set_trace()
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+First shell - Create fifo files and read/write from/to those streams
+
+```python
+mkfifo fifo_stdin
+mkfifo fifo_stdout
+cat fifo_stdout & cat > fifo_stdin
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Second shell - Run the web server
+
+```python
+uv run fifo_app.py
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Third shell - Send web request for hitting the breakpoint
+
+```python
+uvx --from httpie http POST :5555/process data:='["1", "two"]'
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251022233613.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Reverse Remote PDB
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### When you have no access at all...
+
+- In **serverless** environments (e.g., AWS Lambda), we can’t open sockets or SSH in
+- Solution: reverse the connection
+- The Lambda connects _to us_ through a public tunnel (e.g., `ngrok`)
+- Same debugging flow — just inverted
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Real Case
+
+
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->Lambda failed to connect to Postgres → “No module named psycopg2”
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->Worked perfectly in local Docker runtime
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->No SSH, no open sockets — true serverless environment
+- &shy;<!-- .element: class="fragment" data-fragment-index="4" -->Solution: reverse the connection
+	- &shy;<!-- .element: class="fragment" data-fragment-index="5" -->Lambda connects **out** to our `ngrok` tunnel
+	- &shy;<!-- .element: class="fragment" data-fragment-index="6" -->We debug locally through that socket
+- &shy;<!-- .element: class="fragment" data-fragment-index="7" -->Root cause was visible only **inside** the Lambda runtime
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```python
+from remote_pdb import RemotePdb
+RemotePdb("2.tcp.eu.ngrok.io", 18909, reverse=True).set_trace()
+...
+import psycopg
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+First shell - Listen to incoming connections
+
+```python
+nc -l 4444
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Second shell - Tunnel my private machine to the internet using `ngrok`
+
+```python
+ngrok tcp 4444
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+Third shell - Trigger the lambda manually
+
+```python
+sls deploy -f hello
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251023105829.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/talks/slides/debugging_slides/Pasted image 20251023115745.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### sys.settrace
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Beyond traditional debugging
+
+- Sometimes we can’t debug _live_ anymore - the program already ran
+- Instead, we can **trace** what happens
+- `sys.settrace()` lets us catch exceptions or analyze code behavior line by line
+- Useful for catching hidden exceptions or logic errors silently swallowed
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Real Case
+
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" -->After upgrading Python 2 → 3, some tests failed silently
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->No exceptions, only wrong results
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->Added `sys.settrace` to log all handled exceptions
+- &shy;<!-- .element: class="fragment" data-fragment-index="4" -->Found hidden `None` assignment caused by changed assumption
+- &shy;<!-- .element: class="fragment" data-fragment-index="5" -->Tracing revealed the bug immediately — fixed and added a regression test
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/Pasted image 20251024015735.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```python[1|3-14|16]
+import sys
+
+def trace_exceptions(frame, event, arg):
+    if event == "exception":
+        exc_type, exc_value, exc_traceback = arg
+        file_path = frame.f_code.co_filename
+
+        if "debugging_with_sys_settrace" in file_path:
+            print(f"Exception caught: {exc_type.__name__}: {exc_value}")
+            print(f"  File: {frame.f_code.co_filename}")
+            print(f"  Function: {frame.f_code.co_name}")
+            print(f"  Line: {frame.f_lineno}")
+
+    return trace_exceptions
+
+sys.settrace(trace_exceptions)
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/Pasted image 20251024022138.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### py-spy
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### The code is running - but nothing happens...
+
+- The process is stuck - no logs, no output
+- We can’t attach a debugger
+- `py-spy` lets us peek into the running Python process,  see which thread or function is blocking
+- Often used to inspect live issues safely
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```python
+sudo uv run py-spy dump --pid 10758
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/Pasted image 20251024025317.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/Pasted image 20251024025555.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+###  gdb (GNU Debugger)
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### When even Python crashes
+
+- Sometimes the crash happens **below** Python - in C extensions or the interpreter itself
+- No traceback, no exception, just a _core dump_
+- `gdb` lets us inspect that dump and see the native stack trace
+- Essential for debugging native crashes (e.g., `libxml2`, `numpy`, `cython`, etc.)
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Real Case
+
+- &shy;<!-- .element: class="fragment" data-fragment-index="1" --> Production crash with **no Python traceback** (core dump only)
+- &shy;<!-- .element: class="fragment" data-fragment-index="2" -->`gdb` backtrace: our code → `xmlsec` → **`libxml2`** → arithmetic/invalid access
+- &shy;<!-- .element: class="fragment" data-fragment-index="3" -->Root cause: **version mismatch** between `lxml`’s bundled `libxml2` and system `libxml2` used by `xmlsec`
+- &shy;<!-- .element: class="fragment" data-fragment-index="4" --> Same XML object crossed ABI boundary → memory misuse → crash
+- &shy;<!-- .element: class="fragment" data-fragment-index="5" --> Resolution: align dependency versions / build chain → crash resolved
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/Pasted image 20251026003455.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+```python
+gdb .venv/bin/python <core-dump-file>
+```
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/Pasted image 20251026004617.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+<img src="attachments/Pasted image 20251026004856.png" alt="" style="object-fit: scale-down">
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### From local to the deep unknown
+
+- We started with simple local debugging
+- Step by step, we learned to debug across containers, networks, and even crashed interpreters
+- The key is knowing **which tool fits which level of control**
+</div></script></section><section  data-markdown><script type="text/template"><!-- .slide: class="drop" -->
+<div class="" style="position: absolute; left: 0px; top: 0px; height: 700px; width: 1200px; min-height: 700px; display: flex; flex-direction: column; align-items: center; justify-content: center" absolute="true">
+
+### Any Questions?
+
+
+[bit.ly/nogil](https://bit.ly/nogil)
+
+<div class="" style="position: absolute; left: 0%; top: 70%; height: 30%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+Yonatan Bitton
+</br>[@bityob](https://linktr.ee/bityob)
+</br><a href="https://linktr.ee/bityob">linktr.ee/bityob</a>
+</div>
+
+<div class="" style="position: absolute; left: 60%; top: 70%; height: 30%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+
+</div>
+<div class="" style="position: absolute; left: 60%; top: 70%; height: 30%; width: 40%; display: flex; flex-direction: column; align-items: center; justify-content: center" >
+
+<img src="attachments/talks/slides/debugging_slides/bityob.png" alt="" style="width: 150px; object-fit: fill">
+
+</div>
+</div></script></section></div>
+    </div>
+
+    <script src="dist/reveal.js"></script>
+
+    <script src="plugin/markdown/markdown.js"></script>
+    <script src="plugin/highlight/highlight.js"></script>
+    <script src="plugin/zoom/zoom.js"></script>
+    <script src="plugin/notes/notes.js"></script>
+    <script src="plugin/math/math.js"></script>
+	<script src="plugin/mermaid/mermaid.js"></script>
+	<script src="plugin/chart/chart.min.js"></script>
+	<script src="plugin/chart/plugin.js"></script>
+	<script src="plugin/customcontrols/plugin.js"></script>
+	<script src="plugin/elapsed-time-bar/elapsed-time-bar.js"></script>
+
+    <script>
+      function extend() {
+        var target = {};
+        for (var i = 0; i < arguments.length; i++) {
+          var source = arguments[i];
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+              target[key] = source[key];
+            }
+          }
+        }
+        return target;
+      }
+
+	  function isLight(color) {
+		let hex = color.replace('#', '');
+
+		// convert #fff => #ffffff
+		if(hex.length == 3){
+			hex = `${hex[0]}${hex[0]}${hex[1]}${hex[1]}${hex[2]}${hex[2]}`;
+		}
+
+		const c_r = parseInt(hex.substr(0, 2), 16);
+		const c_g = parseInt(hex.substr(2, 2), 16);
+		const c_b = parseInt(hex.substr(4, 2), 16);
+		const brightness = ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+		return brightness > 155;
+	}
+
+	var bgColor = getComputedStyle(document.documentElement).getPropertyValue('--r-background-color').trim();
+	var isLight = isLight(bgColor);
+
+	if(isLight){
+		document.body.classList.add('has-light-background');
+	} else {
+		document.body.classList.add('has-dark-background');
+	}
+
+      // default options to init reveal.js
+      var defaultOptions = {
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        plugins: [
+          RevealMarkdown,
+          RevealHighlight,
+          RevealZoom,
+          RevealNotes,
+          RevealMath.MathJax3,
+		  RevealMermaid,
+		  RevealChart,
+		  RevealCustomControls,
+		  ElapsedTimeBar
+        ],
+
+
+    	allottedTime: 2100 * 1000,
+
+		mathjax3: {
+			mathjax: 'plugin/math/mathjax/tex-mml-chtml.js',
+		},
+		markdown: {
+		  gfm: true,
+		  mangle: true,
+		  pedantic: false,
+		  smartLists: false,
+		  smartypants: false,
+		},
+
+		mermaid: {
+			theme: isLight ? 'default' : 'dark',
+		},
+
+		customcontrols: {
+			controls: [
+			]
+		},
+      };
+
+      // options from URL query string
+      var queryOptions = Reveal().getQueryHash() || {};
+
+      var options = extend(defaultOptions, {"width":1200,"height":700,"margin":0.04,"controls":true,"progress":true,"slideNumber":false,"transition":"none","transitionSpeed":"default"}, queryOptions);
+    </script>
+
+    <script>
+      Reveal.initialize(options);
+    </script>
+  </body>
+
+  <!-- created with Advanced Slides -->
+</html>

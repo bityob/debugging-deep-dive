@@ -1,0 +1,31 @@
+/* Layout: upper-middle placement */
+.reveal .slides section {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: flex-start !important;
+  align-items: center !important;       /* center horizontally */
+  padding: 100px 80px !important;       /* pushes everything down */
+  box-sizing: border-box !important;
+}
+
+/* Headings: consistent title area */
+.reveal .slides section h1,
+.reveal .slides section h2,
+.reveal .slides section h3 {
+  margin: 0 0 40px 0 !important;        /* space below title */
+  text-align: center !important;
+  min-height: 60px !important;          /* reserve space even if short */
+  display: flex;
+  align-items: flex-end;                /* align heading text to bottom of reserved area */
+  justify-content: center;
+  width: 100%;
+}
+
+/* Bullets: consistent block below the title */
+.reveal .slides section ul,
+.reveal .slides section ol {
+  margin: 0 !important;
+  padding-left: 40px !important;
+  width: 70% !important;                /* narrower column */
+  text-align: left !important;
+}
