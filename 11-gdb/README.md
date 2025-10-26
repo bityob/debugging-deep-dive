@@ -1,3 +1,5 @@
+# 11-gdb
+
 ### build
 ```
 docker buildx build --platform=linux/amd64 -t gdb .
@@ -17,4 +19,7 @@ docker run -it --rm --platform linux/amd64 gdb
 ```
 ls -la
 gdb .venv/bin/python <core-file-name>
+
+# Display backtrace on crash
+(gdb) bt
 ```

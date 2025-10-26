@@ -20,4 +20,4 @@ COPY pyproject.toml uv.lock ./
 
 RUN uv sync
 
-COPY debugging_with_gdb.py Makefile ./
+COPY debugging_with_gdb.py .

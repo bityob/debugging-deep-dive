@@ -4,6 +4,8 @@
 
 .ipynb_checkpoints/
 
+__pycache__/
+
 bp-*/
 
 .DS_Store

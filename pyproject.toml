@@ -6,12 +6,5 @@ dependencies = [
     "flask>=3.1.2",
     "jupyter>=1.1.1",
     "pdbpp>=0.11.7",
-    "remote-pdb>=2.1.0",
-    "web-pdb>=1.6.3",
-]
-
-[tool.uv.workspace]
-members = [
-    "03-pdbpp",
-    "11-gdb",
+    "py-spy>=0.4.1",
 ]

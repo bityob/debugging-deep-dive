@@ -1,4 +1,5 @@
 ### 04-ipython
+
 ```
-uv run jupyter
+uv run jupyter lab
 ```
